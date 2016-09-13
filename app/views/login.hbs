@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<link rel="stylesheet" text="text/css" href="/static/bootstrap-3.3.7/css/bootstrap.min.css">
+	<script src="/static/jquery-2.2.4.min.js"></script>
+	<script src="/static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#loginForm,#promptForm").submit(function(e) {
+				$("#message").text("");
+				var form = $(this);
+				$.ajax({
+					url: form.attr("action"),
+					type: form.attr("method"),
+					data: form.serialize(),
+					success: function(data) {
+						console.log(data);
+						if(data.login) {
+							$("#access_token").val(data.accessToken);
+							$("#refresh_token").val(data.refreshToken);
+							$("#redirectToMainForm").submit();
+						} else {
+							$("#message").text(data.message);
+						}
+					},
+					error: function(xhs, status, error) {
+						$("#message").text(error + (xhs? ": " + xhs.responseText : ""));
+					}
+				});
+				e.preventDefault();
+			});
+		});
+
+		var doSubmit = function(action) {
+			switch(action) {
+			case "authenticate":
+				$("#loginForm").attr('action', '{{authBaseRoute}}/authenticate');
+				$("#loginForm").submit();
+				break;
+			case "delete":
+				$("#loginForm").attr('action', '{{authBaseRoute}}/users/delete');
+				$("#loginForm").submit();
+				break;
+			}
+		};
+
+		var doPrompt = function(action) {
+			var form = $("#promptForm");
+			var pass1 = $("#pass1");
+			var label1 = pass1.prev("label");
+			var pass2 = $("#pass2");
+			var label2 = pass2.prev("label");
+			switch(action) {
+			case "change":
+				form.attr("action", "{{authBaseRoute}}/users/update");
+				pass1.attr("name", "password");
+				label1.text("Old Password");
+				pass2.attr("name", "newPassword");
+				label2.text("New Password");
+				break;
+			case "create":
+				form.attr("action", "{{authBaseRoute}}/users");
+				pass1.attr("name", "password");
+				label1.text("Password");
+				pass2.attr("name", "sitePass");
+				label2.text("Site Pass");
+				break;
+			}
+			$("#modalPrompt").modal();
+		};
+
+	</script>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4"></div>
+			<div class="col-md-4">
+				<div id="message-panel"><span id="message">{{message}}</span>&nbsp;</div>
+				<form id="loginForm" class="form-horizontal" method="POST" action="{{authBaseRoute}}/authenticate">
+					<div class="form-group">
+						<label for="username">User Name</label>
+						<input type="text" class="form-control" name="username">
+					</div>
+					<div class="form-group">
+						<label for="password">Password</label>
+						<input type="password" class="form-control" name="password">
+					</div>
+					<button type="button" class="btn btn-default" onclick="doSubmit('authenticate')">Log In</button>
+					<div style="float:right">
+						<a href="javascript:void(0)" onclick="doPrompt('create')">Create Account...</a><br/>
+						<a href="javascript:void(0)" onclick="doSubmit('delete')">Delete Account</a><br/>
+						<a href="javascript:void(0)" onclick="doPrompt('change')">Change Password...</a><br/>
+					</div>
+				</form>
+				<form id="redirectToMainForm" method="POST" action="{{appRoute}}">
+					<input type="hidden" name="access_token" id="access_token">
+					<input type="hidden" name="refresh_token" id="refresh_token">
+				</form>
+			</div>
+			<div class="col-md-4"></div>
+		</div>
+
+		<div id="modalPrompt" class="modal fade" tabindex="-1" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<form id="promptForm" class="form-horizontal" style="padding:20px" method="POST" action="{{authBaseRoute}}/users/update">
+						<div class="modal-body">
+							<div class="form-group">
+								<label for="username">User Name</label>
+								<input type="text" class="form-control" name="username">
+							</div>
+							<div class="form-group">
+								<label for="pass1">[PlaceHolder]</label>
+								<input type="password" class="form-control" name="password" id="pass1">
+							</div>
+							<div id="new-password-group" class="form-group">
+								<label for="pass2">[PlaceHolder]</label>
+								<input type="password" class="form-control" name="newPassword" id="pass2">
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							<button type="submit" class="btn btn-primary" onclick="$('#modalPrompt').modal('hide');">Submit</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
+

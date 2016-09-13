@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<link rel="stylesheet" text="text/css" href="/static/dropzone-4.3.0/basic.min.css">
+	<link rel="stylesheet" text="text/css" href="/static/dropzone-4.3.0/dropzone.min.css">
+	<link rel="stylesheet" text="text/css" href="/static/bootstrap-3.3.7/css/bootstrap.min.css">
+	<script src="/static/jquery-2.2.4.min.js"></script>
+	<script src="/static/dropzone-4.3.0/dropzone.min.js"></script>
+	<script src="/static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+	<script src="/static/jquery-ui-1.12.0.custom/jquery-ui.min.js"></script>
+	<script src="/static/app/js/main.js"></script>
+	<script type="text/javascript">
+		var main = new Main({
+			appRoute: "{{baseRoute}}",
+			authBaseRoute: "{{authBaseRoute}}",
+			tokenStore: new TokenStore("{{accessToken}}", "{{refreshToken}}", "{{authBaseRoute}}"),
+		});
+	</script>
+	{{#if extend}}
+		{{>extra_scripts}}
+	{{/if}}
+</head>
+<body>
+	<div class="container">
+
+
+		<div id="modalPrompt" class="modal fade" tabindex="-1" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="modalInput"></label>
+							<input type="text" class="form-control" id="modalInput">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" id="modalSubmit">Save</button>
+						<div id="modalPromptSubmitError"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<iframe id="downloadFrame" style="display:none;"></iframe>
+
+		<div class="row">
+			<div class="col-md-10"></div>
+			<div class="col-md-2">
+				<button type="submit" class="btn btn-default" style="margin:10px" onclick="main.logout();">Log Out</button>
+			</div>
+		</div>
+
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation"><a href="#tabUpload" aria-controls="tabUpload" role="tab" data-toggle="tab">Upload</a></li>
+			<li role="presentation" class="active"><a href="#tabImagesTable" aria-controls="tabImagesTable" role="tab" data-toggle="tab">Images</a></li>
+			{{#if extend}}
+				{{>extra_tabs}}
+			{{/if}}
+		</ul>
+		<div class="tab-content" style="padding:10px">
+			<div role="tabpanel" class="tab-pane" id="tabUpload">
+				<div id="uploadPanel">
+					<form action="{{baseRoute}}/api/images" class="dropzone" id="uploadDropzone"></form>
+					<div style="padding:10px">
+						<button type="submit" class="btn btn-default" onclick="main.uploader.startScheduleUpload();">Upload</button>
+						<button type="submit" class="btn btn-default" onclick="main.uploader.resetDropzone();">Reset</button>
+					</div>
+				</div>
+			</div>
+			<div role="tabpanel" class="tab-pane active" id="tabImagesTable">
+				<div id="imagesTableButtons" style="padding:10px">
+					<button type="submit" class="btn btn-default" onclick="main.submitDeleteSelectedImages();">Delete</button>
+					<button type="submit" class="btn btn-default" onclick="main.setSeqAndSubmit();">Sequence</button>
+				</div>
+				<table id="imagesTable" class="table table-bordered table-condensed" width="100%"><tbody></tbody></table>
+			</div>
+			{{#if extend}}
+				{{>extra_tabcontents}}
+			{{/if}}
+		</div>
+
+	</div>
+
+</body>
+</html>
+
