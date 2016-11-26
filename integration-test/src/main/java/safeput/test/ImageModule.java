@@ -1,8 +1,14 @@
 package safeput.test;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -36,12 +42,31 @@ public class ImageModule {
 	
 	public void uploadFile() {
 		mainPage.getUploadTab().click();
-		mainPage.getUploadFileInput().sendKeys(testFile.filePath);
-		mainPage.notifyUploader();
+		mainPage.openUploadFileBrowser();
+		selectFileWithRobot();
 		mainPage.getUploadButton().click();
 		mainPage.selectImagesTab();
 		(new WebDriverWait(driver, Util.WAIT_TIMEOUT)).until(
 				ExpectedConditions.visibilityOfElementLocated(mainPage.getImageDownloadLocator(testFile.fileName)));
+	}
+	
+	private void selectFileWithRobot() {
+		try {
+			StringSelection stringSelect = new StringSelection(testFile.filePath);
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelect, null);
+			Robot robot = new Robot();
+			Thread.sleep(2000);
+			robot.keyPress(KeyEvent.VK_CONTROL);
+			robot.keyPress(KeyEvent.VK_V);
+			robot.keyRelease(KeyEvent.VK_V);
+			robot.keyRelease(KeyEvent.VK_CONTROL);
+			Thread.sleep(3000);
+			robot.keyPress(KeyEvent.VK_ENTER);
+			robot.keyRelease(KeyEvent.VK_ENTER);
+			Thread.sleep(2000);
+		} catch (AWTException | InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public void tagImage() {

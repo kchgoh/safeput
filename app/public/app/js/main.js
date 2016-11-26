@@ -162,16 +162,6 @@ function Uploader(tokenStore, onCompleteCb) {
 	this.resetDropzone = function() {
 		dz.removeAllFiles(true);
 	};
-
-	/**
-	 * Called by integration test to programmatically trigger file upload
-	 **/
-	this.testAddFile = function testAddFile(fileName, filePath) {
-		// integration test runner would have set this already
-		var file = $('.dz-hidden-input')[0].files[0];
-		dz.addFile(file);
-		console.log("test added file " + filePath);
-	};
 }
 
 /**

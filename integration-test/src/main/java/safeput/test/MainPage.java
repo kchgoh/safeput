@@ -23,27 +23,8 @@ public class MainPage {
 		return driver.findElement(By.linkText("Upload"));
 	}
 	
-	public WebElement getUploadFileInput() {
-		// We can't easily simulate "drag drop file" to Dropzone, NOR is it
-		// simple to do "click and browser for file" because driving the file
-		// browser window is another beast in itself (see various SO posts).
-		// But Dropzone has a hidden file upload input field, so we can pull it
-		// out by JS (it must be visible for WebDriver to act on), then act on
-		// it as if a normal file input field.
-		Object jsObj = ((JavascriptExecutor)driver).executeScript(
-				"var input = $('.dz-hidden-input'); "
-				+ "input.css({'visibility':'visible','height':'1px','width':'1px'}); "
-				+ "return input[0];");	// need [0] because file input assumes multiple files, but we only need first
-		return (WebElement)jsObj;
-	}
-	
-	/**
-	 * After setting the upload file input, need one more step to notify it
-	 */
-	public void notifyUploader() {
-		Object jsObj = ((JavascriptExecutor)driver).executeScript(
-				"main.uploader.testAddFile(); "
-		);
+	public void openUploadFileBrowser() {
+		driver.findElement(By.id("uploadDropzone")).click();
 	}
 	
 	public WebElement getUploadButton() {
