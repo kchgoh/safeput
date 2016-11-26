@@ -51,9 +51,14 @@ Dependencies
 Configuration
 -------------
 
-Open `/app/config.js`, modify values if required. 
+Values can be found in `/app/config.js`. In particular:
 - `sitePass` is needed when creating new user.
 - `viewsDir` and `resourcesDir` shouldn't be modified unless you move the source files inside too.
+
+The app can run with just the defaults, but of course security-related values should be changed.
+Some values can take environment variables, so there should less need to modify the config file. E.g.
+
+    PORT=80 ; node server.js --no-ssl
 
 
 
